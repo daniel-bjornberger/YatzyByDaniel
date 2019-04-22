@@ -8,7 +8,7 @@ body {
   font-family: Impact, Charcoal, sans-serif;
   color: black;
   margin: 0px;
-  background-color: lightblue;
+  background-color: palegreen;
 }
 
 
@@ -50,7 +50,7 @@ body {
 button {
   font-family: Impact, Charcoal, sans-serif;
   font-size: 1.5em;
-  background-color: lightblue;
+  background-color: palegreen;
   border: thin solid black;
   border-radius: 0.5em;
   color: black;

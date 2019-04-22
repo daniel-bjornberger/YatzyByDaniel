@@ -17,37 +17,19 @@
 
     <body>
 
-        <div class="grid-container">
+        <div class="grid-container"  id="app">
         
             <div class="grid-item" id="header-div">
                 <h1>Yatzy För En</h1>
             </div>
 
-            <div class=grid-item id="dice-div">
 
-                <div>
-                    <img src="js-css-jpg-files/one.jpg" alt="dice">
-                </div>
+            <dice
+                v-bind:dice-pictures="currentDicePictures">
+            </dice>
 
-                <div>
-                    <img src="js-css-jpg-files/two.jpg" alt="dice">
-                </div>
-                    
-                <div>
-                    <img src="js-css-jpg-files/three.jpg" alt="dice">
-                </div>
+            
 
-                <div>
-                    <img src="js-css-jpg-files/four.jpg" alt="dice">
-                </div>
-
-                <div>
-                    <img src="js-css-jpg-files/five.jpg" alt="dice">
-                </div>
-
-                <button id="throw-button">Kasta tärningarna!</button>
-
-            </div>
 
 
 
