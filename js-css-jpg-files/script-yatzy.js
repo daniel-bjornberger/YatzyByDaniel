@@ -45,20 +45,56 @@ Vue.component("dice", {
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+// GÖR OBJEKT!!!
+
+
+
 const store = new Vuex.Store({
     
     state: {
 
-        locked: [false, false, false, false, false],
+        dice: [
+            {value: 1,
+            locked: false},
+        
+            {value: 2,
+            locked: true},
+        
+            {value: 3,
+            locked: false},
+        
+            {value: 4,
+            locked: true},
+        
+            {value: 5,
+            locked: false},        
+        ],
 
-        activeDicePics: ['js-css-jpg-files/one.jpg', 'js-css-jpg-files/two.jpg', 'js-css-jpg-files/three.jpg',
-                            'js-css-jpg-files/four.jpg', 'js-css-jpg-files/five.jpg', 'js-css-jpg-files/six.jpg'],
+        dicePics: [
+            {unlocked: 'js-css-jpg-files/one.jpg',
+            locked: 'js-css-jpg-files/one-locked.jpg',
+            disabled: 'js-css-jpg-files/one-disabled.jpg'},
 
-        disabledDicePics: ['js-css-jpg-files/one-disabled.jpg', 'js-css-jpg-files/two-disabled.jpg',
-                            'js-css-jpg-files/three-disabled.jpg', 'js-css-jpg-files/four-disabled.jpg',
-                            'js-css-jpg-files/five-disabled.jpg', 'js-css-jpg-files/six-disabled.jpg'],
+            {unlocked: 'js-css-jpg-files/two.jpg',
+            locked: 'js-css-jpg-files/two-locked.jpg',
+            disabled: 'js-css-jpg-files/two-disabled.jpg'},
 
-        diceValues: [2, 6, 4, 3, 1],
+            {unlocked: 'js-css-jpg-files/three.jpg',
+            locked: 'js-css-jpg-files/three-locked.jpg',
+            disabled: 'js-css-jpg-files/three-disabled.jpg'},
+
+            {unlocked: 'js-css-jpg-files/four.jpg',
+            locked: 'js-css-jpg-files/four-locked.jpg',
+            disabled: 'js-css-jpg-files/four-disabled.jpg'},
+
+            {unlocked: 'js-css-jpg-files/five.jpg',
+            locked: 'js-css-jpg-files/five-locked.jpg',
+            disabled: 'js-css-jpg-files/five-disabled.jpg'},
+
+            {unlocked: 'js-css-jpg-files/six.jpg',
+            locked: 'js-css-jpg-files/six-locked.jpg',
+            disabled: 'js-css-jpg-files/six-disabled.jpg'}
+        ],
 
         diceDisabled: false
 
@@ -72,17 +108,50 @@ const store = new Vuex.Store({
 
             let length = pictures.length;
 
-            for (let index = 0; index < length; index++) {
+            if (state.diceDisabled) {
 
-                pictures[index] = state.activeDicePics[ state.diceValues[index] - 1 ];
+                for (let index = 0; index < length; index++) {
 
-                console.log("hwj");
-                
-                
+                    pictures[index] = state.dicePics[ state.dice[index].value - 1 ].disabled;
+    
+                    // console.log("Hej!");
+                    
+                }
+
+            }
+
+            else {
+
+                for (let index = 0; index < length; index++) {
+
+                    if (state.dice[index].locked) {
+
+                        pictures[index] = state.dicePics[ state.dice[index].value - 1 ].locked;
+
+                        // console.log("Hej!");
+
+                    }
+
+                    else {
+
+                        pictures[index] = state.dicePics[ state.dice[index].value - 1 ].unlocked;
+                        
+                    }
+                    
+                }
+
             }
 
             return pictures;
 
+        }
+
+    },
+
+    mutations: {
+
+        toggleLocked(state, payload) {
+            state.dice[payload].locked = !state.dice[payload].locked;
         }
 
     }
@@ -115,6 +184,13 @@ const app = new Vue({
     },
 
     methods: {
+
+        toggleLocked: function(index) {
+
+            console.log("Hallå!");
+            
+            store.commit("toggleLocked", index);
+        }
         
     }
 
