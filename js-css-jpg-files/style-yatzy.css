@@ -8,7 +8,7 @@ body {
   font-family: Impact, Charcoal, sans-serif;
   color: black;
   margin: 0px;
-  background-color: palegreen;
+  background-color: thistle;
 }
 
 
@@ -35,10 +35,9 @@ body {
 }
 
 
-#dice-div div {
+/* #dice-div div {
   border: 1px solid black;
-  padding-bottom: 120%;
-}
+} */
 
 
 
@@ -50,7 +49,7 @@ body {
 button {
   font-family: Impact, Charcoal, sans-serif;
   font-size: 1.5em;
-  background-color: palegreen;
+  background-color: thistle;
   border: thin solid black;
   border-radius: 0.5em;
   color: black;
@@ -60,6 +59,12 @@ button {
   transition-duration: 0.5s;
   width: 100%;
   margin: 0.8em 0em 0em 0em;
+}
+
+
+button:hover {
+  color: rgb(0, 153, 0);
+  background-color: whitesmoke;
 }
 
 
@@ -79,8 +84,6 @@ h1 {
 
 
 img {
-  max-width: 80%;
-  position: relative;
-  top: 60%;
+  max-width: 96%;
 }
 
