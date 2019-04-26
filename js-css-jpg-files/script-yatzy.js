@@ -7,11 +7,11 @@ Vue.component("dice", {
     props: [
         "dicePictures",
 
-        "throwButtonDisabled",
+        // "throwButtonDisabled",
 
         "numberOfThrowsLeft",
 
-        "throwDiceInfo"
+        "throwDiceButtonInfo"
     ],
 
     template: `
@@ -41,7 +41,7 @@ Vue.component("dice", {
                 <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
             </div>
 
-            <button id="throw-button" :class="{disabled:throwButtonDisabled}">{{ throwDiceInfo }}</button>
+            <button id="throw-button" :class="{disabled:throwDiceButtonInfo.buttonDisabled}">{{ throwDiceButtonInfo.buttonString }}</button>
 
         </div>
     `,
@@ -117,7 +117,7 @@ const store = new Vuex.Store({
             disabled: 'js-css-jpg-files/six-disabled.jpg'}
         ],
 
-        throwDiceInfo: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning"],
+        throwDiceButtonStrings: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning"],
 
         numberOfThrowsLeft: 2
 
@@ -159,37 +159,40 @@ const store = new Vuex.Store({
 
 
 
-        throwButtonDisabled: state => {
+        // throwButtonDisabled: state => {
 
-            let allDiceLocked = state.dice.every(function(die) {
-                return die.locked;
-            });
+        //     let allDiceLocked = state.dice.every(function(die) {
+        //         return die.locked;
+        //     });
 
-            return allDiceLocked || state.numberOfThrowsLeft === 0;
+        //     return allDiceLocked || state.numberOfThrowsLeft === 0;
 
-        },
+        // },
 
 
 
-        throwDiceInfo: state => {
+        throwDiceButtonInfo: state => {
 
             let numberOfDiceLocked = state.dice.filter(function(die) {
                 return die.locked;
             }).length;
 
-            let throwDiceInfoString;
+            let throwDiceButtonString;
 
             if (numberOfDiceLocked === 5) {
-                throwDiceInfoString = state.throwDiceInfo[2];
+                throwDiceButtonString = state.throwDiceButtonStrings[2];
             }
             else if (numberOfDiceLocked === 4) {
-                throwDiceInfoString = state.throwDiceInfo[1];
+                throwDiceButtonString = state.throwDiceButtonStrings[1];
             }
             else {
-                throwDiceInfoString = state.throwDiceInfo[0];
+                throwDiceButtonString = state.throwDiceButtonStrings[0];
             }            
 
-            return throwDiceInfoString;
+            return {
+                buttonString: throwDiceButtonString,
+                buttonDisabled: (numberOfDiceLocked === 5) || (state.numberOfThrowsLeft === 0)
+            };
 
         }
 
@@ -240,8 +243,8 @@ const app = new Vue({
             return this.$store.state.numberOfThrowsLeft;
         },
 
-        throwDiceInfo() {
-            return this.$store.getters.throwDiceInfo;
+        throwDiceButtonInfo() {
+            return this.$store.getters.throwDiceButtonInfo;
         }
                 
     },
