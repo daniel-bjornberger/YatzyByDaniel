@@ -9,7 +9,9 @@ Vue.component("dice", {
 
         "throwButtonDisabled",
 
-        "numberOfThrowsLeft"
+        "numberOfThrowsLeft",
+
+        "throwDiceInfo"
     ],
 
     template: `
@@ -39,7 +41,7 @@ Vue.component("dice", {
                 <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
             </div>
 
-            <button id="throw-button" :class="{disabled:throwButtonDisabled}">Kasta tärningarna!</button>
+            <button id="throw-button" :class="{disabled:throwButtonDisabled}">{{ throwDiceInfo }}</button>
 
         </div>
     `,
@@ -115,7 +117,9 @@ const store = new Vuex.Store({
             disabled: 'js-css-jpg-files/six-disabled.jpg'}
         ],
 
-        numberOfThrowsLeft: 3
+        throwDiceInfo: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning"],
+
+        numberOfThrowsLeft: 2
 
     },
 
@@ -162,6 +166,30 @@ const store = new Vuex.Store({
             });
 
             return allDiceLocked || state.numberOfThrowsLeft === 0;
+
+        },
+
+
+
+        throwDiceInfo: state => {
+
+            let numberOfDiceLocked = state.dice.filter(function(die) {
+                return die.locked;
+            }).length;
+
+            let throwDiceInfoString;
+
+            if (numberOfDiceLocked === 5) {
+                throwDiceInfoString = state.throwDiceInfo[2];
+            }
+            else if (numberOfDiceLocked === 4) {
+                throwDiceInfoString = state.throwDiceInfo[1];
+            }
+            else {
+                throwDiceInfoString = state.throwDiceInfo[0];
+            }            
+
+            return throwDiceInfoString;
 
         }
 
@@ -210,6 +238,10 @@ const app = new Vue({
 
         numberOfThrowsLeft() {
             return this.$store.state.numberOfThrowsLeft;
+        },
+
+        throwDiceInfo() {
+            return this.$store.getters.throwDiceInfo;
         }
                 
     },
