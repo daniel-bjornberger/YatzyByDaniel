@@ -5,7 +5,11 @@
 Vue.component("dice", {
 
     props: [
-        "dicePictures"
+        "dicePictures",
+
+        "throwButtonDisabled",
+
+        "numberOfThrowsLeft"
     ],
 
     template: `
@@ -31,10 +35,25 @@ Vue.component("dice", {
                 <img :src="dicePictures[4]" @click="toggleLocked(4)" alt="die5">
             </div>
 
-            <button id="throw-button">Kasta tärningarna!</button>
+            <div>
+                <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
+            </div>
+
+            <button id="throw-button" :class="{disabled:throwButtonDisabled}">Kasta tärningarna!</button>
 
         </div>
-    `
+    `,
+
+    methods: {
+
+        toggleLocked: function(index) {
+
+            //console.log("Hallå!");
+            
+            store.commit("toggleLocked", index);
+        }
+        
+    }
 
 });
 
@@ -58,13 +77,13 @@ const store = new Vuex.Store({
             locked: false},
         
             {value: 2,
-            locked: true},
+            locked: false},
         
             {value: 3,
             locked: false},
         
             {value: 4,
-            locked: true},
+            locked: false},
         
             {value: 5,
             locked: false},        
@@ -96,7 +115,7 @@ const store = new Vuex.Store({
             disabled: 'js-css-jpg-files/six-disabled.jpg'}
         ],
 
-        diceDisabled: false
+        numberOfThrowsLeft: 3
 
     },
 
@@ -104,38 +123,26 @@ const store = new Vuex.Store({
 
         getCurrentDicePictures: state => {
 
-            let pictures = new Array(5);
+            let pictures = [];
 
-            let length = pictures.length;
+            if (state.numberOfThrowsLeft === 3) {
 
-            if (state.diceDisabled) {
-
-                for (let index = 0; index < length; index++) {
-
-                    pictures[index] = state.dicePics[ state.dice[index].value - 1 ].disabled;
-    
-                    // console.log("Hej!");
-                    
+                for (let index = 0; index < 5; index++) {
+                    pictures.push(state.dicePics[ state.dice[index].value - 1 ].disabled);
                 }
 
             }
 
             else {
 
-                for (let index = 0; index < length; index++) {
+                for (let index = 0; index < 5; index++) {
 
                     if (state.dice[index].locked) {
-
-                        pictures[index] = state.dicePics[ state.dice[index].value - 1 ].locked;
-
-                        // console.log("Hej!");
-
+                        pictures.push(state.dicePics[ state.dice[index].value - 1 ].locked);
                     }
 
                     else {
-
-                        pictures[index] = state.dicePics[ state.dice[index].value - 1 ].unlocked;
-                        
+                        pictures.push(state.dicePics[ state.dice[index].value - 1 ].unlocked);
                     }
                     
                 }
@@ -144,6 +151,18 @@ const store = new Vuex.Store({
 
             return pictures;
 
+        },
+
+
+
+        throwButtonDisabled: state => {
+
+            let allDiceLocked = state.dice.every(function(die) {
+                return die.locked;
+            });
+
+            return allDiceLocked || state.numberOfThrowsLeft === 0;
+
         }
 
     },
@@ -151,7 +170,11 @@ const store = new Vuex.Store({
     mutations: {
 
         toggleLocked(state, payload) {
-            state.dice[payload].locked = !state.dice[payload].locked;
+
+            if (state.numberOfThrowsLeft < 3) {
+                state.dice[payload].locked = !state.dice[payload].locked;
+            }
+
         }
 
     }
@@ -179,18 +202,21 @@ const app = new Vue({
 
         currentDicePictures() {
             return this.$store.getters.getCurrentDicePictures;
+        },
+
+        throwButtonDisabled() {
+            return this.$store.getters.throwButtonDisabled;
+        },
+
+        numberOfThrowsLeft() {
+            return this.$store.state.numberOfThrowsLeft;
         }
                 
     },
 
     methods: {
 
-        toggleLocked: function(index) {
-
-            console.log("Hallå!");
-            
-            store.commit("toggleLocked", index);
-        }
+        
         
     }
 
