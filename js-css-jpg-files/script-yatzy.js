@@ -41,7 +41,7 @@ Vue.component("dice", {
                 <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
             </div>
 
-            <button id="throw-button" :class="{disabled:throwDiceButtonInfo.buttonDisabled}">{{ throwDiceButtonInfo.buttonString }}</button>
+            <button id="throw-button" @click="throwDice" :class="{disabled:throwDiceButtonInfo.buttonDisabled}">{{ throwDiceButtonInfo.buttonString }}</button>
 
         </div>
     `,
@@ -53,6 +53,28 @@ Vue.component("dice", {
             //console.log("Hallå!");
             
             store.commit("toggleLocked", index);
+        },
+
+
+        throwDice: function() {
+
+            // minska antal slag med 1, via en commit
+
+            let numberOfRandomisations = 20;
+
+            let interval = setInterval(function() {
+
+                //commit, kör random på de tärningar som ej är låsta
+                console.log("throwDice!!!");                
+
+                numberOfRandomisations--;
+
+                if (numberOfRandomisations === 0) {
+                    clearInterval(interval);
+                }
+
+            }, 100);
+
         }
         
     }
