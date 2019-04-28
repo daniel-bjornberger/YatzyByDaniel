@@ -7,9 +7,9 @@ Vue.component("dice", {
     props: [
         "dicePictures",
 
-        "numberOfThrowsLeft",
+        // "numberOfThrowsLeft",
 
-        "throwDiceButtonInfo"
+        "throwDiceInfo"
     ],
 
     template: `
@@ -36,10 +36,10 @@ Vue.component("dice", {
             </div>
 
             <div>
-                <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
+                <p>{{ throwDiceInfo.numberOfThrowsLeft }} kast kvar</p>
             </div>
 
-            <button id="throw-button" @click="throwDice" :class="{disabled:(throwDiceButtonInfo.noThrowsLeft || throwDiceButtonInfo.allDiceLocked || throwDiceButtonInfo.throwOngoing)}">{{ throwDiceButtonInfo.buttonString }}</button>
+            <button id="throw-button" @click="throwDice" :class="{disabled:(throwDiceInfo.numberOfThrowsLeft === 0 || throwDiceInfo.allDiceLocked || throwDiceInfo.throwOngoing)}">{{ throwDiceInfo.buttonString }}</button>
 
         </div>
     `,
@@ -56,7 +56,7 @@ Vue.component("dice", {
 
         throwDice: function() {
 
-            if (this.numberOfThrowsLeft > 0 && !this.throwDiceButtonInfo.allDiceLocked && !this.throwDiceButtonInfo.throwOngoing) {
+            if (this.throwDiceInfo.numberOfThrowsLeft > 0 && !this.throwDiceInfo.allDiceLocked && !this.throwDiceInfo.throwOngoing) {
 
                 store.commit("toggleThrowOngoing");
 
@@ -154,11 +154,17 @@ const store = new Vuex.Store({
             disabled: 'js-css-jpg-files/six-disabled.jpg'}
         ],
 
-        throwDiceButtonStrings: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning", "Inget kast kvar"],
+        throwDiceButtonStrings: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning", ""],
 
         numberOfThrowsLeft: 3,
 
-        throwOngoing: false
+        throwOngoing: false,
+
+
+
+        
+
+
 
     },
 
@@ -210,7 +216,7 @@ const store = new Vuex.Store({
 
 
 
-        throwDiceButtonInfo: state => {
+        throwDiceInfo: state => {
 
             let numberOfDiceLocked = state.dice.filter(function(die) {
                 return die.locked;
@@ -233,7 +239,7 @@ const store = new Vuex.Store({
 
             return {
                 buttonString: throwDiceButtonString,
-                noThrowsLeft: state.numberOfThrowsLeft === 0,
+                numberOfThrowsLeft: state.numberOfThrowsLeft,
                 allDiceLocked: numberOfDiceLocked === 5,
                 throwOngoing: state.throwOngoing
             };
@@ -319,12 +325,12 @@ const app = new Vue({
             return this.$store.getters.throwButtonDisabled;
         },
 
-        numberOfThrowsLeft() {
-            return this.$store.state.numberOfThrowsLeft;
-        },
+        // numberOfThrowsLeft() {
+        //     return this.$store.state.numberOfThrowsLeft;
+        // },
 
-        throwDiceButtonInfo() {
-            return this.$store.getters.throwDiceButtonInfo;
+        throwDiceInfo() {
+            return this.$store.getters.throwDiceInfo;
         }
                 
     }
