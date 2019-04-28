@@ -8,7 +8,7 @@ body {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   color: black;
   margin: 0px;
-  background-color: thistle;
+  background-color: lightblue;
 }
 
 
@@ -86,7 +86,7 @@ body {
 button {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
   font-size: 4.5vw;
-  background-color: thistle;
+  background-color: lightblue;
   border: thin solid black;
   border-radius: 0.5em;
   color: black;
