@@ -7,8 +7,6 @@ Vue.component("dice", {
     props: [
         "dicePictures",
 
-        // "throwButtonDisabled",
-
         "numberOfThrowsLeft",
 
         "throwDiceButtonInfo"
@@ -41,7 +39,7 @@ Vue.component("dice", {
                 <p>Antal kast kvar: {{ numberOfThrowsLeft }}</p>
             </div>
 
-            <button id="throw-button" @click="throwDice" :class="{disabled:throwDiceButtonInfo.buttonDisabled}">{{ throwDiceButtonInfo.buttonString }}</button>
+            <button id="throw-button" @click="throwDice" :class="{disabled:(throwDiceButtonInfo.noThrowsLeft || throwDiceButtonInfo.allDiceLocked || throwDiceButtonInfo.throwOngoing)}">{{ throwDiceButtonInfo.buttonString }}</button>
 
         </div>
     `,
@@ -58,22 +56,39 @@ Vue.component("dice", {
 
         throwDice: function() {
 
-            // minska antal slag med 1, via en commit
+            if (this.numberOfThrowsLeft > 0 && !this.throwDiceButtonInfo.allDiceLocked && !this.throwDiceButtonInfo.throwOngoing) {
 
-            let numberOfRandomisations = 20;
+                store.commit("toggleThrowOngoing");
 
-            let interval = setInterval(function() {
+                //store.commit("decreaseNumberOfThrowsLeft");
 
-                //commit, kör random på de tärningar som ej är låsta
-                console.log("throwDice!!!");                
+                // minska antal slag med 1, via en commit
 
-                numberOfRandomisations--;
+                let numberOfRandomisations = 13;
 
-                if (numberOfRandomisations === 0) {
-                    clearInterval(interval);
-                }
+                let interval = setInterval(function() {
 
-            }, 100);
+                    //commit, kör random på de tärningar som ej är låsta
+
+                    store.commit("randomizeDice");
+
+                    //console.log("throwDice!!!");                
+
+                    numberOfRandomisations--;
+
+                    if (numberOfRandomisations === 0) {
+
+                        clearInterval(interval);
+
+                        store.commit("toggleThrowOngoing");
+
+                        store.commit("decreaseNumberOfThrowsLeft");
+
+                    }
+
+                }, 75);                
+
+            }
 
         }
         
@@ -139,9 +154,11 @@ const store = new Vuex.Store({
             disabled: 'js-css-jpg-files/six-disabled.jpg'}
         ],
 
-        throwDiceButtonStrings: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning"],
+        throwDiceButtonStrings: ["Kasta tärningarna!", "Kasta tärningen!", "Ingen olåst tärning", "Inget kast kvar"],
 
-        numberOfThrowsLeft: 2
+        numberOfThrowsLeft: 3,
+
+        throwOngoing: false
 
     },
 
@@ -151,7 +168,7 @@ const store = new Vuex.Store({
 
             let pictures = [];
 
-            if (state.numberOfThrowsLeft === 3) {
+            if ( (state.numberOfThrowsLeft === 3) && !state.throwOngoing) {
 
                 for (let index = 0; index < 5; index++) {
                     pictures.push(state.dicePics[ state.dice[index].value - 1 ].disabled);
@@ -201,7 +218,10 @@ const store = new Vuex.Store({
 
             let throwDiceButtonString;
 
-            if (numberOfDiceLocked === 5) {
+            if (state.numberOfThrowsLeft === 0) {
+                throwDiceButtonString = state.throwDiceButtonStrings[3];
+            }
+            else if (numberOfDiceLocked === 5) {
                 throwDiceButtonString = state.throwDiceButtonStrings[2];
             }
             else if (numberOfDiceLocked === 4) {
@@ -213,7 +233,9 @@ const store = new Vuex.Store({
 
             return {
                 buttonString: throwDiceButtonString,
-                buttonDisabled: (numberOfDiceLocked === 5) || (state.numberOfThrowsLeft === 0)
+                noThrowsLeft: state.numberOfThrowsLeft === 0,
+                allDiceLocked: numberOfDiceLocked === 5,
+                throwOngoing: state.throwOngoing
             };
 
         }
@@ -224,11 +246,47 @@ const store = new Vuex.Store({
 
         toggleLocked(state, payload) {
 
-            if (state.numberOfThrowsLeft < 3) {
+            if (state.numberOfThrowsLeft < 3 && !state.throwOngoing) {
                 state.dice[payload].locked = !state.dice[payload].locked;
             }
 
-        }
+        },
+
+
+
+         decreaseNumberOfThrowsLeft(state) {
+
+            state.numberOfThrowsLeft--;
+
+         },
+
+
+
+         randomizeDice(state) {
+
+            state.dice.forEach(function(die) {
+                
+                if (!die.locked) {
+
+                    die.value = Math.floor(Math.random() * 6) + 1;
+                    
+                    //console.log(die.value);                    
+
+                }
+
+            });
+
+         },
+
+
+
+         toggleThrowOngoing(state) {
+
+            state.throwOngoing = !state.throwOngoing;
+            
+            //console.log("mutation toggleThrowOngoing");            
+
+         }
 
     }
 
@@ -269,12 +327,6 @@ const app = new Vue({
             return this.$store.getters.throwDiceButtonInfo;
         }
                 
-    },
-
-    methods: {
-
-        
-        
     }
 
 });
