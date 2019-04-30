@@ -14,23 +14,23 @@ const dice = {
         <div class=grid-item id="dice-div">
 
             <div>
-                <img :src="dicePictures[0]" @click="toggleLocked(0)" alt="die1">
+                <img :src="dicePictures.pics[0]" @click="toggleLocked(0)" alt="die1" :class="{minusTenDeg:dicePictures.rotations[0] === -2, minusFiveDeg:dicePictures.rotations[0] === -1, plusFiveDeg:dicePictures.rotations[0] === 1, plusTenDeg:dicePictures.rotations[0] === 2}">
             </div>
 
             <div>
-                <img :src="dicePictures[1]" @click="toggleLocked(1)" alt="die2">
+                <img :src="dicePictures.pics[1]" @click="toggleLocked(1)" alt="die2" :class="{minusTenDeg:dicePictures.rotations[1] === -2, minusFiveDeg:dicePictures.rotations[1] === -1, plusFiveDeg:dicePictures.rotations[1] === 1, plusTenDeg:dicePictures.rotations[1] === 2}">
             </div>
                 
             <div>
-                <img :src="dicePictures[2]" @click="toggleLocked(2)" alt="die3">
+                <img :src="dicePictures.pics[2]" @click="toggleLocked(2)" alt="die3" :class="{minusTenDeg:dicePictures.rotations[2] === -2, minusFiveDeg:dicePictures.rotations[2] === -1, plusFiveDeg:dicePictures.rotations[2] === 1, plusTenDeg:dicePictures.rotations[2] === 2}">
             </div>
 
             <div>
-                <img :src="dicePictures[3]" @click="toggleLocked(3)" alt="die4">
+                <img :src="dicePictures.pics[3]" @click="toggleLocked(3)" alt="die4" :class="{minusTenDeg:dicePictures.rotations[3] === -2, minusFiveDeg:dicePictures.rotations[3] === -1, plusFiveDeg:dicePictures.rotations[3] === 1, plusTenDeg:dicePictures.rotations[3] === 2}">
             </div>
 
             <div>
-                <img :src="dicePictures[4]" @click="toggleLocked(4)" alt="die5">
+                <img :src="dicePictures.pics[4]" @click="toggleLocked(4)" alt="die5" :class="{minusTenDeg:dicePictures.rotations[4] === -2, minusFiveDeg:dicePictures.rotations[4] === -1, plusFiveDeg:dicePictures.rotations[4] === 1, plusTenDeg:dicePictures.rotations[4] === 2}">
             </div>
 
             <div>
@@ -82,6 +82,8 @@ const dice = {
 
                         store.commit("decreaseNumberOfThrowsLeft");
 
+                        store.commit("resetDiceRotations");
+
                     }
 
                 }, 75);                
@@ -108,19 +110,24 @@ const store = new Vuex.Store({
 
         dice: [
             {value: 1,
-            locked: false},
+            locked: false,
+            rotation: 0},
         
             {value: 2,
-            locked: false},
+            locked: false,
+            rotation: 0},
         
             {value: 3,
-            locked: false},
+            locked: false,
+            rotation: 0},
         
             {value: 4,
-            locked: false},
+            locked: false,
+            rotation: 0},
         
             {value: 5,
-            locked: false},        
+            locked: false,
+            rotation: 0},        
         ],
 
         dicePics: [
@@ -261,7 +268,16 @@ const store = new Vuex.Store({
 
             }
 
-            return pictures;
+            let rots = [];
+
+            for (let index = 0; index < 5; index++) {
+                rots.push(state.dice[index].rotation)                
+            }
+
+            return {
+                pics: pictures,
+                rotations: rots
+            };
 
         },
 
@@ -338,8 +354,10 @@ const store = new Vuex.Store({
                 if (!die.locked) {
 
                     die.value = Math.floor(Math.random() * 6) + 1;
+
+                    die.rotation = Math.floor(Math.random() * 5) - 2;
                     
-                    //console.log(die.value);                    
+                    //console.log(die.rotation);                    
 
                 }
 
@@ -354,6 +372,16 @@ const store = new Vuex.Store({
             state.throwOngoing = !state.throwOngoing;
             
             //console.log("mutation toggleThrowOngoing");            
+
+         },
+
+
+
+         resetDiceRotations(state) {
+
+            state.dice.forEach(function(die) {
+                die.rotation = 0;
+            });
 
          }
 
