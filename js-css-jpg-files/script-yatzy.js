@@ -2,12 +2,10 @@
 
 
 
-Vue.component("dice", {
+const dice = {
 
     props: [
         "dicePictures",
-
-        // "numberOfThrowsLeft",
 
         "throwDiceInfo"
     ],
@@ -94,16 +92,13 @@ Vue.component("dice", {
         
     }
 
-});
+};
 
 
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-// GÖR OBJEKT!!!
 
 
 
@@ -161,8 +156,76 @@ const store = new Vuex.Store({
         throwOngoing: false,
 
 
+        scoreCategoriesPart1: [
+            {categoryString: "Ettor",
+            points: 0,
+            pointsSet: false},
 
-        
+            {categoryString: "Tvåor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Treor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Fyror",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Femmor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Sexor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Delsumma",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Bonus",
+            points: 0,
+            pointsSet: false}
+        ],
+
+
+
+        scoreCategoriesPart2: [
+            {categoryString: "Ett par",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Två par",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Treor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Fyror",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Femmor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Sexor",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Delsumma",
+            points: 0,
+            pointsSet: false},
+
+            {categoryString: "Bonus",
+            points: 0,
+            pointsSet: false}
+        ]
+
 
 
 
@@ -314,6 +377,10 @@ const app = new Vue({
     el: "#app",
 
     store,
+
+    components: {
+        "dice": dice
+      },
 
     computed: {
 
