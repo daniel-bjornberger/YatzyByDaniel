@@ -84,6 +84,8 @@ const dice = {
 
                         store.commit("resetDiceRotations");
 
+                        store.commit("calculatePoints");
+
                     }
 
                 }, 75);                
@@ -104,7 +106,9 @@ const dice = {
 const scoreCategoryRow = {
 
     props: [
-        "categoryAndPointsRow"
+        "categoryAndPointsRow",
+
+        "scoreTableInfo"
     ],
 
 
@@ -116,11 +120,34 @@ const scoreCategoryRow = {
             </div>
 
             <div>
-                <p>{{ categoryAndPointsRow.points }}</p>
+                <p>{{ showPoints(categoryAndPointsRow) }}</p>
             </div>
 
         </div>
-    `
+    `,
+
+
+    methods: {
+     
+        showPoints: function(currentRow) {
+
+            if( currentRow.pointsSet || ( this.scoreTableInfo.numberOfThrowsLeft < 3 && !this.scoreTableInfo.throwOngoing ) ) {
+
+                return currentRow.points;
+
+            }
+
+            else {
+
+                return "";
+
+            }
+
+        }
+
+    }
+
+
 
 };
 
@@ -132,7 +159,9 @@ const scoreTable = {
 
     props: [
 
-        "categoryAndPointsInfo"
+        "categoryAndPointsInfo",
+
+        "scoreTableInfo"
 
     ],
 
@@ -143,6 +172,7 @@ const scoreTable = {
             <score-category-row
                 v-for="categoryAndPointsRow, index in categoryAndPointsInfo"
                 v-bind:category-and-points-row="categoryAndPointsRow"
+                v-bind:score-table-info="scoreTableInfo"
                 v-bind:key="categoryAndPointsRow.id">
             </score-category-row>
 
@@ -276,90 +306,90 @@ const store = new Vuex.Store({
 
 
         scoreCategories: [
-            {id: 1,
+            {id: 0,
             categoryString: "Ettor",
             points: 0,
             pointsSet: false},
 
-            {id: 2,
+            {id: 1,
             categoryString: "Tvåor",
             points: 0,
             pointsSet: false},
 
-            {id: 3,
+            {id: 2,
             categoryString: "Treor",
             points: 0,
             pointsSet: false},
 
-            {id: 4,
+            {id: 3,
             categoryString: "Fyror",
             points: 0,
             pointsSet: false},
 
-            {id: 5,
+            {id: 4,
             categoryString: "Femmor",
             points: 0,
             pointsSet: false},
 
-            {id: 6,
+            {id: 5,
             categoryString: "Sexor",
             points: 0,
             pointsSet: false},
 
-            {id: 7,
+            {id: 6,
             categoryString: "Delsumma",
             points: 0,
             pointsSet: false},
 
-            {id: 8,
+            {id: 7,
             categoryString: "Bonus",
             points: 0,
             pointsSet: false},
 
-            {id: 9,
+            {id: 8,
             categoryString: "Ett par",
             points: 0,
             pointsSet: false},
 
-            {id: 10,
+            {id: 9,
             categoryString: "Två par",
             points: 0,
-            pointsSet: false},
+            pointsSet: true},
 
-            {id: 11,
+            {id: 10,
             categoryString: "Tretal",
             points: 0,
             pointsSet: false},
 
-            {id: 12,
+            {id: 11,
             categoryString: "Fyrtal",
             points: 0,
             pointsSet: false},
 
-            {id: 13,
+            {id: 12,
             categoryString: "Liten stege",
             points: 0,
-            pointsSet: false},
+            pointsSet: true},
 
-            {id: 14,
+            {id: 13,
             categoryString: "Stor stege",
             points: 0,
             pointsSet: false},
 
-            {id: 15,
+            {id: 14,
             categoryString: "Kåk",
             points: 0,
             pointsSet: false},
 
-            {id: 16,
+            {id: 15,
             categoryString: "Chans",
             points: 0,
             pointsSet: false},
 
-            {id: 17,
+            {id: 16,
             categoryString: "Yatzy",
             points: 0,
-            pointsSet: false}
+            pointsSet: true}
         ],
 
 
@@ -372,6 +402,8 @@ const store = new Vuex.Store({
 
 
     },
+
+
 
     getters: {
 
@@ -462,6 +494,18 @@ const store = new Vuex.Store({
 
 
 
+
+        scoreTableInfo: state => {
+
+            return {
+                numberOfThrowsLeft: state.numberOfThrowsLeft,
+                throwOngoing: state.throwOngoing
+            }
+
+        },
+
+
+
         rulesInfo: state => {
 
             let buttonString;
@@ -486,6 +530,8 @@ const store = new Vuex.Store({
 
     },
 
+
+    
     mutations: {
 
         toggleLocked(state, payload) {
@@ -550,9 +596,18 @@ const store = new Vuex.Store({
 
             state.rulesInfo.showRules = !state.rulesInfo.showRules;
             
+         },
+
+
+
+
+         calculatePoints(state) {
+
+            state.scoreCategories.forEach(function(scoreCategory) {
+                scoreCategory.points = 100;
+            });
+
          }
-
-
 
 
     }
@@ -605,20 +660,24 @@ const app = new Vue({
 
 
 
+        scoreTableInfo() {
 
-        // showPoints(index) {
+            return this.$store.getters.scoreTableInfo;
 
-
-            
-        // },
-
+        },
 
 
-        
+               
 
 
         rulesInfo() {
             return this.$store.getters.rulesInfo;
+        },
+
+
+
+        computedValue() {
+            return 100;
         }
 
 
