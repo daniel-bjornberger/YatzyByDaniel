@@ -122,7 +122,7 @@ button:hover {
 
 .disabled:hover {
   color: black;
-  background-color: thistle;
+  background-color: lightblue;
 }
 
 
@@ -161,7 +161,7 @@ img {
   display: grid;
   grid-template-columns: 2fr 1fr;  
   grid-template-rows: auto;
-  grid-gap: 2px;
+  grid-gap: 1px;
 }
 
 
@@ -267,4 +267,23 @@ img {
 
 #score-grid-div > div:nth-child(17) {
   grid-area: 9 / 2 / 10 / 3;
+}
+
+
+#rules-info-div div:nth-child(1){
+  display: none;
+}
+
+
+#rules-info-div p{
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  font-size: 4.5vw;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+
+#footer-div {
+  font-size: 3vw;
+  margin: 1em 1em 1em 1em;
 }
