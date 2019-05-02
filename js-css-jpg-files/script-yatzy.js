@@ -98,6 +98,118 @@ const dice = {
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+const scoreCategoryRow = {
+
+    props: [
+        "categoryAndPointsRow"
+    ],
+
+
+    template: `
+        <div class="scoreCategory">
+
+            <div>
+                <p>{{ categoryAndPointsRow.categoryString }}</p>
+            </div>
+
+            <div>
+                <p>{{ categoryAndPointsRow.points }}</p>
+            </div>
+
+        </div>
+    `
+
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+const scoreTable = {
+
+    props: [
+
+        "categoryAndPointsInfo"
+
+    ],
+
+
+    template: `
+        <div class=grid-item id="score-grid-div">
+
+            <score-category-row
+                v-for="categoryAndPointsRow, index in categoryAndPointsInfo"
+                v-bind:category-and-points-row="categoryAndPointsRow"
+                v-bind:key="categoryAndPointsRow.id">
+            </score-category-row>
+
+        </div>
+    `,
+
+
+    components: {
+        "score-category-row": scoreCategoryRow
+    },
+
+
+
+
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+const rulesInformation = {
+
+    props: [
+    
+        "rulesInfo"
+    
+    ],
+
+    template: `
+        <div class="grid-item" id="rules-info-div">
+
+            <div>
+            
+                <p>{{ rulesInfo.rulesString }}</p>
+
+            </div>
+
+            <div>
+            
+                <button @click="toggleShowRules">{{ rulesInfo.buttonString }}</button>
+
+                <p v-show="rulesInfo.showRules">{{ rulesInfo.rulesString }}</p>
+
+            </div>
+
+        </div>
+    `,
+
+
+    methods: {
+        
+        toggleShowRules: function() {
+
+            store.commit("toggleShowRules");
+        }
+
+    }
+
+
+};
+
+
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,77 +275,100 @@ const store = new Vuex.Store({
         throwOngoing: false,
 
 
-        scoreCategoriesPart1: [
-            {categoryString: "Ettor",
+        scoreCategories: [
+            {id: 1,
+            categoryString: "Ettor",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Tvåor",
+            {id: 2,
+            categoryString: "Tvåor",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Treor",
+            {id: 3,
+            categoryString: "Treor",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Fyror",
+            {id: 4,
+            categoryString: "Fyror",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Femmor",
+            {id: 5,
+            categoryString: "Femmor",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Sexor",
+            {id: 6,
+            categoryString: "Sexor",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Delsumma",
+            {id: 7,
+            categoryString: "Delsumma",
             points: 0,
             pointsSet: false},
 
-            {categoryString: "Bonus",
+            {id: 8,
+            categoryString: "Bonus",
+            points: 0,
+            pointsSet: false},
+
+            {id: 9,
+            categoryString: "Ett par",
+            points: 0,
+            pointsSet: false},
+
+            {id: 10,
+            categoryString: "Två par",
+            points: 0,
+            pointsSet: false},
+
+            {id: 11,
+            categoryString: "Tretal",
+            points: 0,
+            pointsSet: false},
+
+            {id: 12,
+            categoryString: "Fyrtal",
+            points: 0,
+            pointsSet: false},
+
+            {id: 13,
+            categoryString: "Liten stege",
+            points: 0,
+            pointsSet: false},
+
+            {id: 14,
+            categoryString: "Stor stege",
+            points: 0,
+            pointsSet: false},
+
+            {id: 15,
+            categoryString: "Kåk",
+            points: 0,
+            pointsSet: false},
+
+            {id: 16,
+            categoryString: "Chans",
+            points: 0,
+            pointsSet: false},
+
+            {id: 17,
+            categoryString: "Yatzy",
             points: 0,
             pointsSet: false}
         ],
 
 
 
-        scoreCategoriesPart2: [
-            {categoryString: "Ett par",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Två par",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Treor",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Fyror",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Femmor",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Sexor",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Delsumma",
-            points: 0,
-            pointsSet: false},
-
-            {categoryString: "Bonus",
-            points: 0,
-            pointsSet: false}
-        ]
-
-
+        rulesInfo: {
+            buttonStrings: ["Visa regler och tips", "Dölj regler och tips"],
+            showRules: false,
+        
+            rulesString: "- Här ska det stå info om regler -\n- Och andra tips... -\n\n- Så småningom... -"}
 
 
     },
@@ -323,7 +458,31 @@ const store = new Vuex.Store({
                 throwOngoing: state.throwOngoing
             };
 
+        },
+
+
+
+        rulesInfo: state => {
+
+            let buttonString;
+
+            if (state.rulesInfo.showRules) {
+                buttonString = state.rulesInfo.buttonStrings[1];
+            }
+            else {
+                buttonString = state.rulesInfo.buttonStrings[0];
+            }
+
+            return {
+                buttonString: buttonString,
+                showRules: state.rulesInfo.showRules,
+                rulesString: state.rulesInfo.rulesString
+            }
+
         }
+
+
+
 
     },
 
@@ -383,7 +542,18 @@ const store = new Vuex.Store({
                 die.rotation = 0;
             });
 
+         },
+
+
+
+         toggleShowRules(state) {
+
+            state.rulesInfo.showRules = !state.rulesInfo.showRules;
+            
          }
+
+
+
 
     }
 
@@ -407,8 +577,10 @@ const app = new Vue({
     store,
 
     components: {
-        "dice": dice
-      },
+        "dice": dice,
+        "score-table": scoreTable,
+        "rules-information": rulesInformation
+    },
 
     computed: {
 
@@ -416,17 +588,40 @@ const app = new Vue({
             return this.$store.getters.getCurrentDicePictures;
         },
 
+
         throwButtonDisabled() {
             return this.$store.getters.throwButtonDisabled;
         },
 
-        // numberOfThrowsLeft() {
-        //     return this.$store.state.numberOfThrowsLeft;
-        // },
 
         throwDiceInfo() {
             return this.$store.getters.throwDiceInfo;
+        },
+
+
+        scoreCategories() {
+            return this.$store.state.scoreCategories;
+        },
+
+
+
+
+        // showPoints(index) {
+
+
+            
+        // },
+
+
+
+        
+
+
+        rulesInfo() {
+            return this.$store.getters.rulesInfo;
         }
+
+
                 
     }
 
