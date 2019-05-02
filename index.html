@@ -12,14 +12,15 @@
 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 
-        <link rel="stylesheet" type="text/css" href="js-css-jpg-files/style-yatzy.css"> 
+        <link rel="stylesheet" type="text/css" href="js-css-jpg-files/style-yatzy.css">
 
     </head>
 
 
     <body>
 
-        <div class="grid-container"  id="app">
+        <div class="grid-container" id="app">
+
         
             <div class="grid-item" id="header-div">
                 <h1>Yatzy För En</h1>
@@ -36,10 +37,27 @@
                 v-bind:category-and-points-info="scoreCategories">
             </score-table>
 
-            
 
+            <rules-information
+                v-bind:rules-info="rulesInfo">
+            </rules-information>
 
+            <div class="grid-item" id="footer-div">
 
+                <footer>
+
+                    <em>
+
+                        Yatzy-sida skapad av Daniel Björnberger,<br>Java18, ITHS Göteborg
+                        <br>
+                        <br>
+                        Laboration 2 - Vue och Vuex, i kursen<br>'Utveckling av webbapplikationer'
+
+                    </em>
+
+                </footer>
+    
+            </div>
 
 
         </div>
