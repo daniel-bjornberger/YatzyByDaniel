@@ -29,13 +29,15 @@
 
             <dice
                 v-bind:dice-pictures="currentDicePictures"
-                v-bind:throw-dice-info="throwDiceInfo">
+                v-bind:throw-dice-info="throwDiceInfo"
+                v-bind:result="result">
             </dice>
 
 
             <score-table
                 v-bind:category-and-points-info="scoreCategories"
-                v-bind:score-table-info="scoreTableInfo">
+                v-bind:score-table-info="scoreTableInfo"
+                v-bind:result="result">
             </score-table>
 
 
