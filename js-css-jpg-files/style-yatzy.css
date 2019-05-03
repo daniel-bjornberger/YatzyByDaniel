@@ -12,6 +12,7 @@ body {
   color: black;
   margin: 0px;
   background-color: lightblue;
+  cursor: default;
 }
 
 
@@ -377,4 +378,10 @@ img {
   0%   {background-color:ivory;}
   50%  {background-color:lightgreen;}
   100% {background-color:ivory;}
+}
+
+
+
+div.pointsSet{
+  background-color: lightblue;
 }
