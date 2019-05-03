@@ -154,7 +154,7 @@ button:hover {
 
 h1 {
   margin: 0em;
-  font-size: 8vw;
+  font-size: 6vw;
 }
 
 
@@ -197,7 +197,7 @@ img {
 
 
 .scoreCategory p {
-  margin: 0.4em 0em 0.4em 0em;
+  margin: 0.5em 0em 0.5em 0em;
   font-size: 4vw;
 }
 
@@ -326,3 +326,55 @@ img {
 }
 
 
+
+.zeroPoints {
+  -webkit-animation-name: zeroPointsAnimation;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  animation-name: zeroPointsAnimation;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+}
+
+
+
+@-webkit-keyframes zeroPointsAnimation {
+  0%   {background-color:ivory;}
+  50%  {background-color:orangered;}
+  100% {background-color:ivory;}
+}
+
+
+
+@keyframes zeroPointsAnimation {
+  0%   {background-color:ivory;}
+  50%  {background-color:orangered;}
+  100% {background-color:ivory;}
+}
+
+
+
+.moreThanZeroPoints {
+  -webkit-animation-name: moreThanZeroPointsAnimation;
+  -webkit-animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+  animation-name: moreThanZeroPointsAnimation;
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+}
+
+
+
+@-webkit-keyframes moreThanZeroPointsAnimation {
+  0%   {background-color:ivory;}
+  50%  {background-color:lightgreen;}
+  100% {background-color:ivory;}
+}
+
+
+
+@keyframes moreThanZeroPointsAnimation {
+  0%   {background-color:ivory;}
+  50%  {background-color:lightgreen;}
+  100% {background-color:ivory;}
+}
