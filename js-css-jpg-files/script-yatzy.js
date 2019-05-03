@@ -119,7 +119,7 @@ const scoreCategoryRow = {
                 <p>{{ categoryAndPointsRow.categoryString }}</p>
             </div>
 
-            <div :class="{zeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.numberOfThrowsLeft < 3 && !scoreTableInfo.throwOngoing && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points === 0), moreThanZeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.numberOfThrowsLeft < 3 && !scoreTableInfo.throwOngoing && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points > 0)}">
+            <div @click="setPoints(categoryAndPointsRow.id)" :class="{pointsSet: categoryAndPointsRow.pointsSet, zeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points === 0), moreThanZeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points > 0)}">
                 <p>{{ showPoints(categoryAndPointsRow) }}</p>
             </div>
 
@@ -146,6 +146,18 @@ const scoreCategoryRow = {
             else {
 
                 return "";
+
+            }
+
+        },
+
+
+
+        setPoints: function(rowId) {
+
+            if (!this.categoryAndPointsRow.pointsSet && this.scoreTableInfo.possibleToSetPoints && this.categoryAndPointsRow.id !== 6 && this.categoryAndPointsRow.id !== 7) {
+
+                store.commit("setPoints", rowId);
 
             }
 
@@ -282,6 +294,8 @@ function onesToSixes(value, numberOfDice) {
 
 
 
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -289,15 +303,19 @@ function sumOnesToSixes(scoreCategories) {
 
     let scoreCategoriesOnesToSixes = scoreCategories.slice(0, 6);
 
-    //console.log(scoreCategoriesOnesToSixes);
+    console.log(scoreCategoriesOnesToSixes);
 
     if (scoreCategoriesOnesToSixes.every(function(scoreCategory) {
 
-        return scoreCategory.pointsSet;
+        console.log("OK!");
+
+        return scoreCategory.pointsSet;        
 
     })) {
 
         scoreCategories[6].pointsSet = true;
+
+        console.log("Hej!");
 
     }
 
@@ -633,6 +651,8 @@ const store = new Vuex.Store({
 
         throwOngoing: false,
 
+        possibleToSetPoints: false,
+
 
         scoreCategories: [
             {id: 0,
@@ -828,7 +848,8 @@ const store = new Vuex.Store({
 
             return {
                 numberOfThrowsLeft: state.numberOfThrowsLeft,
-                throwOngoing: state.throwOngoing
+                throwOngoing: state.throwOngoing,
+                possibleToSetPoints: state.possibleToSetPoints && !state.throwOngoing
             }
 
         },
@@ -938,64 +959,90 @@ const store = new Vuex.Store({
 
             state.scoreCategories.forEach(function(scoreCategory) {
 
+                if(!scoreCategory.pointsSet) {
 
-                switch (scoreCategory.id) {
 
-                    case 0:
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                        scoreCategory.points = onesToSixes(scoreCategory.id, numberOfDice);
-                        break;
+                    switch (scoreCategory.id) {
 
-                    case 6:
-                        scoreCategory.points = sumOnesToSixes(state.scoreCategories);
-                        break;
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                            scoreCategory.points = onesToSixes(scoreCategory.id, numberOfDice);
+                            break;
 
-                    case 7:
-                        scoreCategory.points = calculateBonus(state.scoreCategories);
-                        break;
+                        case 6:
+                            scoreCategory.points = sumOnesToSixes(state.scoreCategories);
+                            break;
 
-                    case 8:
-                        scoreCategory.points = onePair(numberOfDice);
-                        break;
+                        case 7:
+                            scoreCategory.points = calculateBonus(state.scoreCategories);
+                            break;
 
-                    case 9:
-                        scoreCategory.points = twoPair(numberOfDice);
-                        break;
+                        case 8:
+                            scoreCategory.points = onePair(numberOfDice);
+                            break;
 
-                    case 10:
-                        scoreCategory.points = threeAndFourOfAKind(numberOfDice, 3);
-                        break;
+                        case 9:
+                            scoreCategory.points = twoPair(numberOfDice);
+                            break;
 
-                    case 11:
-                        scoreCategory.points = threeAndFourOfAKind(numberOfDice, 4);
-                        break;
+                        case 10:
+                            scoreCategory.points = threeAndFourOfAKind(numberOfDice, 3);
+                            break;
 
-                    case 12:
-                        scoreCategory.points = smallStraight(numberOfDice);
-                        break;
+                        case 11:
+                            scoreCategory.points = threeAndFourOfAKind(numberOfDice, 4);
+                            break;
 
-                    case 13:
-                        scoreCategory.points = largeStraight(numberOfDice);
-                        break;
+                        case 12:
+                            scoreCategory.points = smallStraight(numberOfDice);
+                            break;
 
-                    case 14:
-                        scoreCategory.points = fullHouse(numberOfDice);
-                        break;
+                        case 13:
+                            scoreCategory.points = largeStraight(numberOfDice);
+                            break;
 
-                    case 15:
-                        scoreCategory.points = chance(numberOfDice);
-                        break;
+                        case 14:
+                            scoreCategory.points = fullHouse(numberOfDice);
+                            break;
 
-                    case 16:
-                        scoreCategory.points = yatzy(numberOfDice);
-                        break;
+                        case 15:
+                            scoreCategory.points = chance(numberOfDice);
+                            break;
+
+                        case 16:
+                            scoreCategory.points = yatzy(numberOfDice);
+                            break;
+
+                    }
+
 
                 }
 
+            });
+
+            state.possibleToSetPoints = true;
+
+         },
+
+
+
+         //store.commit("setPoints", rowId);
+
+         setPoints(state, payload) {
+
+            state.scoreCategories[payload].pointsSet = true;
+
+            state.possibleToSetPoints = false;
+
+            state.numberOfThrowsLeft = 3;
+
+            state.dice.forEach(function(die) {
+
+                die.locked = false;
 
             });
 
@@ -1064,14 +1111,7 @@ const app = new Vue({
 
         rulesInfo() {
             return this.$store.getters.rulesInfo;
-        },
-
-
-
-        computedValue() {
-            return 100;
         }
-
 
                 
     }
