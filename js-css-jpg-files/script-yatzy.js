@@ -131,7 +131,13 @@ const scoreCategoryRow = {
      
         showPoints: function(currentRow) {
 
-            if( currentRow.pointsSet || ( this.scoreTableInfo.numberOfThrowsLeft < 3 && !this.scoreTableInfo.throwOngoing ) ) {
+            if ( (currentRow.id === 6 || currentRow.id === 7) && !currentRow.pointsSet) {
+
+                return "";
+
+            }
+
+            else if( currentRow.pointsSet || ( this.scoreTableInfo.numberOfThrowsLeft < 3 && !this.scoreTableInfo.throwOngoing ) ) {
 
                 return currentRow.points;
 
@@ -238,6 +244,98 @@ const rulesInformation = {
 
 
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+function countNumberOfDice(dice) {
+
+    let numberOfDice = [];
+
+    for (let index = 1; index <= 6; index++) {
+
+        numberOfDice.push(dice.filter(function(die) {
+            return die.value === index;
+        }).length);
+        
+    }
+
+    return numberOfDice;    
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function onesToSixes(value, numberOfDice) {
+
+    return numberOfDice[value] * (value + 1);
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function sumOnesToSixes(scoreCategories) {
+
+    let scoreCategoriesOnesToSixes = scoreCategories.slice(0, 6);
+
+    //console.log(scoreCategoriesOnesToSixes);
+
+    if (scoreCategoriesOnesToSixes.every(function(scoreCategory) {
+
+        return scoreCategory.pointsSet;
+
+    })) {
+
+        scoreCategories[6].pointsSet = true;
+
+    }
+
+    return scoreCategoriesOnesToSixes.reduce(function(accumulator, scoreCategory) {
+
+        return accumulator + scoreCategory.points;
+
+    }, 0);
+
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function calculateBonus(scoreCategories) {
+
+    if (scoreCategories[6].pointsSet) {
+
+        scoreCategories[7].pointsSet = true;
+
+        if (scoreCategories[6].points >= 63) {
+
+            scoreCategories[7].points = 50;
+
+        }
+
+        else {
+
+            scoreCategories[7].points = 0;
+
+        }
+
+    }
+
+}
 
 
 
@@ -354,7 +452,7 @@ const store = new Vuex.Store({
             {id: 9,
             categoryString: "Två par",
             points: 0,
-            pointsSet: true},
+            pointsSet: false},
 
             {id: 10,
             categoryString: "Tretal",
@@ -369,7 +467,7 @@ const store = new Vuex.Store({
             {id: 12,
             categoryString: "Liten stege",
             points: 0,
-            pointsSet: true},
+            pointsSet: false},
 
             {id: 13,
             categoryString: "Stor stege",
@@ -389,7 +487,7 @@ const store = new Vuex.Store({
             {id: 16,
             categoryString: "Yatzy",
             points: 0,
-            pointsSet: true}
+            pointsSet: false}
         ],
 
 
@@ -531,7 +629,7 @@ const store = new Vuex.Store({
     },
 
 
-    
+
     mutations: {
 
         toggleLocked(state, payload) {
@@ -603,8 +701,37 @@ const store = new Vuex.Store({
 
          calculatePoints(state) {
 
+            let numberOfDice = countNumberOfDice(state.dice);
+
+            //console.log(numberOfDice);            
+
             state.scoreCategories.forEach(function(scoreCategory) {
-                scoreCategory.points = 100;
+
+
+                switch (scoreCategory.id) {
+
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                        scoreCategory.points = onesToSixes(scoreCategory.id, numberOfDice);
+                        break;
+
+                    case 6:
+                        scoreCategory.points = sumOnesToSixes(state.scoreCategories);
+                        break;
+
+                    case 7:
+                        scoreCategory.points = calculateBonus(state.scoreCategories);
+
+
+
+
+                }
+
+
             });
 
          }
