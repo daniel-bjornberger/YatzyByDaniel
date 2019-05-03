@@ -7,7 +7,9 @@ const dice = {
     props: [
         "dicePictures",
 
-        "throwDiceInfo"
+        "throwDiceInfo",
+
+        "result"
     ],
 
     template: `
@@ -37,7 +39,7 @@ const dice = {
                 <p>{{ throwDiceInfo.numberOfThrowsLeft }} kast kvar</p>
             </div>
 
-            <button id="throw-button" @click="throwDice" :class="{disabled:(throwDiceInfo.numberOfThrowsLeft === 0 || throwDiceInfo.allDiceLocked || throwDiceInfo.throwOngoing)}">{{ throwDiceInfo.buttonString }}</button>
+            <button id="throw-button" @click="throwDice" :class="{disabled:(throwDiceInfo.numberOfThrowsLeft === 0 || throwDiceInfo.allDiceLocked || throwDiceInfo.throwOngoing || result.allCategoriesSet)}">{{ throwDiceInfo.buttonString }}</button>
 
         </div>
     `,
@@ -46,31 +48,22 @@ const dice = {
 
         toggleLocked: function(index) {
 
-            //console.log("Hallå!");
-            
             store.commit("toggleLocked", index);
+
         },
 
 
         throwDice: function() {
 
-            if (this.throwDiceInfo.numberOfThrowsLeft > 0 && !this.throwDiceInfo.allDiceLocked && !this.throwDiceInfo.throwOngoing) {
+            if (this.throwDiceInfo.numberOfThrowsLeft > 0 && !this.throwDiceInfo.allDiceLocked && !this.throwDiceInfo.throwOngoing && !this.result.allCategoriesSet) {
 
                 store.commit("toggleThrowOngoing");
-
-                //store.commit("decreaseNumberOfThrowsLeft");
-
-                // minska antal slag med 1, via en commit
 
                 let numberOfRandomisations = 13;
 
                 let interval = setInterval(function() {
 
-                    //commit, kör random på de tärningar som ej är låsta
-
                     store.commit("randomizeDice");
-
-                    //console.log("throwDice!!!");                
 
                     numberOfRandomisations--;
 
@@ -179,13 +172,21 @@ const scoreTable = {
 
         "categoryAndPointsInfo",
 
-        "scoreTableInfo"
+        "scoreTableInfo",
+
+        "result"
 
     ],
 
 
     template: `
         <div class=grid-item id="score-grid-div">
+
+            <p v-show=result.allCategoriesSet>
+                Du fick totalt {{ result.totalPoints }} poäng av maximalt 374 poäng.
+            </p>
+
+            <button v-show=result.allCategoriesSet @click="startNewRound">Starta en ny omgång</button>
 
             <score-category-row
                 v-for="categoryAndPointsRow, index in categoryAndPointsInfo"
@@ -201,6 +202,18 @@ const scoreTable = {
     components: {
         "score-category-row": scoreCategoryRow
     },
+
+
+
+    methods: {
+        
+        startNewRound: function() {
+
+            store.commit("startNewRound");
+
+        }
+
+    }
 
 
 
@@ -296,64 +309,6 @@ function onesToSixes(value, numberOfDice) {
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-function sumOnesToSixes(scoreCategories) {
-
-    let scoreCategoriesOnesToSixes = scoreCategories.slice(0, 6);
-
-    console.log(scoreCategoriesOnesToSixes);
-
-    if (scoreCategoriesOnesToSixes.every(function(scoreCategory) {
-
-        console.log("OK!");
-
-        return scoreCategory.pointsSet;        
-
-    })) {
-
-        scoreCategories[6].pointsSet = true;
-
-        console.log("Hej!");
-
-    }
-
-    return scoreCategoriesOnesToSixes.reduce(function(accumulator, scoreCategory) {
-
-        return accumulator + scoreCategory.points;
-
-    }, 0);
-
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-function calculateBonus(scoreCategories) {
-
-    if (scoreCategories[6].pointsSet) {
-
-        scoreCategories[7].pointsSet = true;
-
-        if (scoreCategories[6].points >= 63) {
-
-            return 50;
-
-        }
-
-        else {
-
-            return 0;
-
-        }
-
-    }
-
-}
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -362,8 +317,6 @@ function calculateBonus(scoreCategories) {
 
 function onePair(numberOfDice) {
 
-    //console.log(numberOfDice);
-
     let indexForHighestPair = numberOfDice.reverse().findIndex(function(numberOfDie) {
 
         return numberOfDie >= 2;
@@ -371,8 +324,6 @@ function onePair(numberOfDice) {
     });
 
     numberOfDice.reverse();
-
-    //console.log(numberOfDice);
 
     if (indexForHighestPair === -1) {
 
@@ -799,16 +750,6 @@ const store = new Vuex.Store({
 
 
 
-        // throwButtonDisabled: state => {
-
-        //     let allDiceLocked = state.dice.every(function(die) {
-        //         return die.locked;
-        //     });
-
-        //     return allDiceLocked || state.numberOfThrowsLeft === 0;
-
-        // },
-
 
 
         throwDiceInfo: state => {
@@ -873,6 +814,62 @@ const store = new Vuex.Store({
                 rulesString: state.rulesInfo.rulesString
             }
 
+        },
+
+
+
+        result: state => {
+
+            let scoreCategoriesModified = state.scoreCategories.slice(0, 6).concat(state.scoreCategories.slice(8));
+
+            let allCategoriesSet = scoreCategoriesModified.every(function(scoreCategory) {
+
+                return scoreCategory.pointsSet;
+
+            });
+
+
+            let totalPoints = 0;
+
+            if (allCategoriesSet) {
+
+                state.scoreCategories[6].pointsSet = true;
+
+                state.scoreCategories[7].pointsSet = true;
+
+                state.scoreCategories[6].points = state.scoreCategories.slice(0, 6).reduce(function(accumulator, scoreCategory) {
+
+                    return accumulator + scoreCategory.points;
+                                
+                }, 0);
+
+
+                if (state.scoreCategories[6].points >= 63) {
+
+                    state.scoreCategories[7].points = 50;
+                    
+                }
+                    
+                else {
+                    
+                    state.scoreCategories[7].points =  0;
+                    
+                }
+
+
+                for (let index = 6; index <= 16; index++) {
+
+                    totalPoints += state.scoreCategories[index].points;
+
+                }
+
+            }
+
+            return {
+                allCategoriesSet: allCategoriesSet,
+                totalPoints: totalPoints
+            }
+
         }
 
 
@@ -912,8 +909,6 @@ const store = new Vuex.Store({
 
                     die.rotation = Math.floor(Math.random() * 5) - 2;
                     
-                    //console.log(die.rotation);                    
-
                 }
 
             });
@@ -926,8 +921,6 @@ const store = new Vuex.Store({
 
             state.throwOngoing = !state.throwOngoing;
             
-            //console.log("mutation toggleThrowOngoing");            
-
          },
 
 
@@ -955,8 +948,6 @@ const store = new Vuex.Store({
 
             let numberOfDice = countNumberOfDice(state.dice);
 
-            //console.log(numberOfDice);            
-
             state.scoreCategories.forEach(function(scoreCategory) {
 
                 if(!scoreCategory.pointsSet) {
@@ -971,14 +962,6 @@ const store = new Vuex.Store({
                         case 4:
                         case 5:
                             scoreCategory.points = onesToSixes(scoreCategory.id, numberOfDice);
-                            break;
-
-                        case 6:
-                            scoreCategory.points = sumOnesToSixes(state.scoreCategories);
-                            break;
-
-                        case 7:
-                            scoreCategory.points = calculateBonus(state.scoreCategories);
                             break;
 
                         case 8:
@@ -1029,8 +1012,6 @@ const store = new Vuex.Store({
          },
 
 
-
-         //store.commit("setPoints", rowId);
 
          setPoints(state, payload) {
 
@@ -1111,6 +1092,11 @@ const app = new Vue({
 
         rulesInfo() {
             return this.$store.getters.rulesInfo;
+        },
+
+
+        result() {
+            return this.$store.getters.result;
         }
 
                 
