@@ -119,7 +119,7 @@ const scoreCategoryRow = {
                 <p>{{ categoryAndPointsRow.categoryString }}</p>
             </div>
 
-            <div>
+            <div :class="{zeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.numberOfThrowsLeft < 3 && !scoreTableInfo.throwOngoing && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points === 0), moreThanZeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.numberOfThrowsLeft < 3 && !scoreTableInfo.throwOngoing && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points > 0)}">
                 <p>{{ showPoints(categoryAndPointsRow) }}</p>
             </div>
 
@@ -323,19 +323,250 @@ function calculateBonus(scoreCategories) {
 
         if (scoreCategories[6].points >= 63) {
 
-            scoreCategories[7].points = 50;
+            return 50;
 
         }
 
         else {
 
-            scoreCategories[7].points = 0;
+            return 0;
 
         }
 
     }
 
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function onePair(numberOfDice) {
+
+    //console.log(numberOfDice);
+
+    let indexForHighestPair = numberOfDice.reverse().findIndex(function(numberOfDie) {
+
+        return numberOfDie >= 2;
+
+    });
+
+    numberOfDice.reverse();
+
+    //console.log(numberOfDice);
+
+    if (indexForHighestPair === -1) {
+
+        return 0;
+
+    }
+
+    else {
+
+        return 2 * (6 - indexForHighestPair);
+
+    }    
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function twoPair(numberOfDice) {
+
+    let indexForLowestPair = numberOfDice.findIndex(function(numberOfDie) {
+
+        return numberOfDie >= 2;
+
+    });
+
+
+    let indexForHighestPair = 5 - numberOfDice.reverse().findIndex(function(numberOfDie) {
+
+        return numberOfDie >= 2;
+
+    });
+
+    numberOfDice.reverse();
+
+
+    if ( (indexForLowestPair !== -1) && (indexForHighestPair !== 6) && (indexForLowestPair !== indexForHighestPair) ) {
+
+        return 2 * (2 + indexForLowestPair + indexForHighestPair);
+
+    }
+
+    else {
+
+        return 0;
+
+    }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function threeAndFourOfAKind(numberOfDice, minNumber) {
+
+    let index = numberOfDice.findIndex(function(numberOfDie) {
+
+        return numberOfDie >= minNumber;
+
+    });
+
+    if (index === -1) {
+
+        return 0;
+
+    }
+
+    else {
+
+        return minNumber * (index + 1);
+
+    }
+
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function smallStraight(numberOfDice) {
+
+    if (numberOfDice.slice(0, 5).every(function(value) {
+
+        return value === 1;
+
+    })) {
+
+        return 15;
+
+    }
+
+    else {
+
+        return 0;
+    }
+
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function largeStraight(numberOfDice) {
+
+    if (numberOfDice.slice(1, 6).every(function(value) {
+
+        return value === 1;
+
+    })) {
+
+        return 20;
+
+    }
+
+    else {
+
+        return 0;
+    }
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function fullHouse(numberOfDice) {
+
+    let indexPair = numberOfDice.findIndex(function(numberOfDie) {
+
+        return numberOfDie === 2;
+
+    });
+
+
+    let indexThreeOfAKind = numberOfDice.findIndex(function(numberOfDie) {
+
+        return numberOfDie === 3;
+
+    });
+
+    if (indexPair === -1 || indexThreeOfAKind === -1) {
+
+        return 0;
+
+    }
+
+    else {
+
+        return 2 * (indexPair + 1) + 3 * (indexThreeOfAKind + 1);
+
+    }
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+function chance(numberOfDice) {
+
+    let sum = 0;
+
+    numberOfDice.forEach(function(numberOfDie, index) {
+
+        sum += numberOfDie * (index + 1);
+
+    });
+
+    return sum;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+function yatzy(numberOfDice) {
+
+    if (numberOfDice.some(function(numberOfDie) {
+
+        return numberOfDie === 5;
+
+    })) {
+
+        return 50;
+
+    }
+
+    else {
+
+        return 0;
+
+    }
+
+}
+
+
+
 
 
 
@@ -725,9 +956,43 @@ const store = new Vuex.Store({
 
                     case 7:
                         scoreCategory.points = calculateBonus(state.scoreCategories);
+                        break;
 
+                    case 8:
+                        scoreCategory.points = onePair(numberOfDice);
+                        break;
 
+                    case 9:
+                        scoreCategory.points = twoPair(numberOfDice);
+                        break;
 
+                    case 10:
+                        scoreCategory.points = threeAndFourOfAKind(numberOfDice, 3);
+                        break;
+
+                    case 11:
+                        scoreCategory.points = threeAndFourOfAKind(numberOfDice, 4);
+                        break;
+
+                    case 12:
+                        scoreCategory.points = smallStraight(numberOfDice);
+                        break;
+
+                    case 13:
+                        scoreCategory.points = largeStraight(numberOfDice);
+                        break;
+
+                    case 14:
+                        scoreCategory.points = fullHouse(numberOfDice);
+                        break;
+
+                    case 15:
+                        scoreCategory.points = chance(numberOfDice);
+                        break;
+
+                    case 16:
+                        scoreCategory.points = yatzy(numberOfDice);
+                        break;
 
                 }
 
