@@ -1027,6 +1027,18 @@ const store = new Vuex.Store({
 
             });
 
+         },
+
+
+
+         startNewRound(state) {
+
+            state.scoreCategories.forEach(function(scoreCategory) {
+
+                scoreCategory.pointsSet = false;
+
+            });
+
          }
 
 
