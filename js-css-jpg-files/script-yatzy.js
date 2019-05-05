@@ -87,6 +87,77 @@ const dice = {
 
         }
         
+    },
+
+
+
+    created() {
+
+        window.addEventListener('keydown', function(e) {
+
+            if(e.keyCode == 32 && e.target == document.body) {
+
+              e.preventDefault();
+
+            }
+
+          });
+
+
+
+
+        window.addEventListener('keyup', (event) => {
+
+            if (event.keyCode >= 49 && event.keyCode <= 53) {
+
+                this.toggleLocked(event.keyCode - 49);
+
+            }
+
+            else if (event.keyCode >= 97 && event.keyCode <= 101) {
+
+                this.toggleLocked(event.keyCode - 97);
+
+            }
+
+            else if (event.keyCode === 72) {
+
+                this.toggleLocked(0);
+
+            }
+
+            else if (event.keyCode === 74) {
+
+                this.toggleLocked(1);
+
+            }
+
+            else if (event.keyCode === 75) {
+
+                this.toggleLocked(2);
+
+            }
+
+            else if (event.keyCode === 78) {
+
+                this.toggleLocked(3);
+
+            }
+
+            else if (event.keyCode === 77) {
+
+                this.toggleLocked(4);
+
+            }
+
+            else if (event.keyCode === 32) {
+
+                this.throwDice();
+
+            }
+
+          });        
+
     }
 
 };
@@ -101,7 +172,9 @@ const scoreCategoryRow = {
     props: [
         "categoryAndPointsRow",
 
-        "scoreTableInfo"
+        "scoreTableInfo",
+
+        "result"
     ],
 
 
@@ -112,7 +185,7 @@ const scoreCategoryRow = {
                 <p>{{ categoryAndPointsRow.categoryString }}</p>
             </div>
 
-            <div @click="setPoints(categoryAndPointsRow.id)" :class="{pointsSet: categoryAndPointsRow.pointsSet, zeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points === 0), moreThanZeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points > 0)}">
+            <div @click="setPoints(categoryAndPointsRow)" :class="{pointsSet: categoryAndPointsRow.pointsSet, zeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points === 0), moreThanZeroPoints: (categoryAndPointsRow.id !== 6 && categoryAndPointsRow.id !== 7 && scoreTableInfo.possibleToSetPoints && !categoryAndPointsRow.pointsSet && categoryAndPointsRow.points > 0)}">
                 <p>{{ showPoints(categoryAndPointsRow) }}</p>
             </div>
 
@@ -146,11 +219,77 @@ const scoreCategoryRow = {
 
 
 
-        setPoints: function(rowId) {
+        setPoints: function(currentRow) {
 
-            if (!this.categoryAndPointsRow.pointsSet && this.scoreTableInfo.possibleToSetPoints && this.categoryAndPointsRow.id !== 6 && this.categoryAndPointsRow.id !== 7) {
+            if (!currentRow.pointsSet && this.scoreTableInfo.possibleToSetPoints && currentRow.id !== 6 && currentRow.id !== 7) {
 
-                store.commit("setPoints", rowId);
+                store.commit("setPoints", currentRow.id);
+
+            }
+
+        },
+
+
+
+        arrowsPressed: function(keyCode) {
+
+            if (keyCode === 37) {
+
+                store.commit("arrowLeft");
+
+            }
+
+            else if (keyCode === 38) {
+
+                store.commit("arrowUp");
+
+            }
+
+            else if (keyCode === 39) {
+
+                store.commit("arrowRight");
+
+            }
+
+            else if (keyCode === 40) {
+
+                store.commit("arrowDown");
+
+            }
+
+        },
+
+
+
+        enterPressed: function() {
+
+            if (!this.result.allCategoriesSet) {
+
+                this.setPoints("""currentRowId""");
+
+            }
+
+        }
+
+
+
+    },
+
+
+
+    created() {
+
+        window.addEventListener('keyup', (event) => {
+
+            if (event.keyCode >= 37 && event.keyCode <= 40) {
+
+                this.arrowsPressed(event.keyCode);
+
+            }
+
+            else if (event.keyCode === 13) {
+
+                this.enterPressed();
 
             }
 
@@ -192,6 +331,7 @@ const scoreTable = {
                 v-for="categoryAndPointsRow, index in categoryAndPointsInfo"
                 v-bind:category-and-points-row="categoryAndPointsRow"
                 v-bind:score-table-info="scoreTableInfo"
+                v-bind:result="result"
                 v-bind:key="categoryAndPointsRow.id">
             </score-category-row>
 
@@ -538,6 +678,27 @@ function yatzy(numberOfDice) {
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+removeCurrentId(currentRowId, choosableIds) {
+
+    if (currentRowId <= 5) {
+
+        choosableIds.left.splice(choosableIds.left.indexOf(currentRowId), 1);
+
+    }
+
+    else {
+
+        choosableIds.right.splice(choosableIds.right.indexOf(currentRowId), 1);
+
+    }
+
+}
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -698,7 +859,17 @@ const store = new Vuex.Store({
             buttonStrings: ["Visa regler och tips", "Dölj regler och tips"],
             showRules: false,
         
-            rulesString: "- Här ska det stå info om regler -\n- Och andra tips... -\n\n- Så småningom... -"}
+            rulesString: "- Här ska det stå info om regler -\n- Och andra tips... -\n\n- Så småningom... -"},
+
+
+        choosableIds: {
+            left: [0, 1, 2, 3, 4, 5],
+
+            right: [8, 9, 10, 11, 12, 13, 14, 15]
+        },
+
+
+        currentId: 0
 
 
     },
@@ -1013,13 +1184,15 @@ const store = new Vuex.Store({
 
 
 
-         setPoints(state, payload) {
+         setPoints(state, currentRowId) {
 
-            state.scoreCategories[payload].pointsSet = true;
+            state.scoreCategories[currentRowId].pointsSet = true;
 
             state.possibleToSetPoints = false;
 
             state.numberOfThrowsLeft = 3;
+
+            removeCurrentId(currentRowId, state.choosableIds);
 
             state.dice.forEach(function(die) {
 
@@ -1039,7 +1212,164 @@ const store = new Vuex.Store({
 
             });
 
-         }
+            state.choosableIds.left = [0, 1, 2, 3, 4, 5];
+
+            state.choosableIds.right = [8, 9, 10, 11, 12, 13, 14, 15];
+
+         },
+
+
+
+         setInitialId(state) {
+
+            if (state.choosableIds.left.length > 0) {
+
+                state.currentId = state.choosableIds.left[0];
+
+            }
+
+            else if (state.choosableIds.right.length > 0) {
+
+                state.currentId = state.choosableIds.right[0];
+
+            }
+
+            else {
+
+                state.currentId = -1;
+
+            }
+
+         },
+
+
+
+         arrowUp(state) {
+
+            if (state.currentId <= 5 && state.choosableIds.left.indexOf(state.currentId) > 0) {
+
+                state.currentId = state.choosableIds.left[ state.choosableIds.left.indexOf(state.currentId) - 1 ];
+
+            }
+
+            else if (state.currentId >= 8 && state.choosableIds.right.indexOf(state.currentId) > 0) {
+
+                state.currentId = state.choosableIds.right[ state.choosableIds.right.indexOf(state.currentId) - 1 ];
+
+            }
+
+         },
+
+
+
+         arrowDown(state) {
+
+            if (state.currentId <= 5 && state.choosableIds.left.indexOf(state.currentId) < state.choosableIds.left.length - 1) {
+
+                state.currentId = state.choosableIds.left[ state.choosableIds.left.indexOf(state.currentId) + 1 ];
+
+            }
+
+            else if (state.currentId >= 8 && state.choosableIds.right.indexOf(state.currentId) < state.choosableIds.right.length - 1) {
+
+                state.currentId = state.choosableIds.right[ state.choosableIds.right.indexOf(state.currentId) + 1 ];
+
+            }
+
+         },
+
+
+
+         arrowRight(state) {
+
+            if (state.currentId <= 5 && state.choosableIds.right.length > 0) {
+
+                let possibleNewId = state.currentId + 8;
+
+                if (state.choosableIds.right.indexOf(possibleNewId !== -1)) {
+
+                    state.currentId = possibleNewId;
+
+                }
+
+                else {
+
+                    let possibleNewIndex = state.choosableIds.right.findIndex(function(value) {
+
+                        return value > possibleNewId;
+
+                    });
+
+                    if (possibleNewIndex === 0) {
+
+                        state.currentId = state.choosableIds.right[0];
+
+                    }
+
+                    else if (possibleNewIndex === -1) {
+
+                        state.currentId = state.choosableIds.right.slice(-1)[0];
+
+                    }
+
+                    else {
+
+                        state.currentId = state.choosableIds.right[possibleNewIndex - 1];
+
+                    }
+
+                }
+
+            }
+
+         },
+
+
+
+         arrowLeft(state) {
+
+            if (state.currentId >= 8 && state.choosableIds.left.length > 0) {
+
+                let possibleNewId = state.currentId - 8;
+
+                if (state.choosableIds.left.indexOf(possibleNewId !== -1)) {
+
+                    state.currentId = possibleNewId;
+
+                }
+
+                else {
+
+                    let possibleNewIndex = state.choosableIds.left.findIndex(function(value) {
+
+                        return value > possibleNewId;
+
+                    });
+
+                    if (possibleNewIndex === 0) {
+
+                        state.currentId = state.choosableIds.left[0];
+
+                    }
+
+                    else if (possibleNewIndex === -1) {
+
+                        state.currentId = state.choosableIds.left.slice(-1)[0];
+
+                    }
+
+                    else {
+
+                        state.currentId = state.choosableIds.left[possibleNewIndex - 1];
+
+                    }
+
+                }
+
+            }
+
+        },
+
 
 
     }
