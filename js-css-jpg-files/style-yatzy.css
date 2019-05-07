@@ -630,6 +630,7 @@
   #score-grid-div {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    align-content: start;
     padding: 0.8em;
     grid-gap: 2px;
   }
@@ -639,7 +640,6 @@
   .scoreCategory {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    grid-template-rows: auto;
     grid-gap: 1px;
   }
 
@@ -855,8 +855,15 @@
 
 
 
-  div.pointsSet{
+  div.pointsSet {
     background-color: lightblue;
+  }
+
+
+  div.currentlyChosenScoreCategory {
+    -webkit-box-shadow:inset 0px 0px 0px 5px blue;
+    -moz-box-shadow:inset 0px 0px 0px 5px blue;
+    box-shadow:inset 0px 0px 0px 5px blue;
   }
 
 
