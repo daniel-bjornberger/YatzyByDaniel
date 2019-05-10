@@ -331,8 +331,13 @@
 
 
   #footer-div {
-    font-size: 3vw;
     margin: 1em 1em 1em 1em;
+  }
+
+
+
+  footer {
+    font-size: 3vw;
   }
 
 
@@ -795,8 +800,13 @@
 
 
   #footer-div {
-    font-size: 1.5vw;
     margin: 1em 1em 1em 1em;
+  }
+
+
+
+  footer {
+    font-size: 1.5vw;
   }
 
 
